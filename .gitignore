@@ -1,0 +1,30 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+db.sqlite3
+.env
+
+# Django static/media
+/staticfiles/
+/media/
+
+# React
+node_modules/
+build/
+dist/
+*.log
+*.env
+
+# VSCode
+.vscode/
+
+# macOS
+.DS_Store
+
+# 기타
+*.swp

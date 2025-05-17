@@ -1,0 +1,72 @@
+{
+    "user_id": "123456789",
+    "name": "Justin Tak",
+    "email": "justin.tak0426@gmail.com",
+    "phone_number": "+82-10-1234-5678",
+    "membership_tier": "Gold",
+    "reward_points": 1250,
+    "favorite_drinks": [
+        "Caffe Latte",
+        "Caramel Macchiato",
+        "Cold Brew",
+        "Vanilla Latte",
+        "Espresso"
+    ],
+    "saved_menu": [
+        {
+            "nickname": "Morning Boost",
+            "menu": "Caffe Latte",
+            "extra": "Vanilla Syrup",
+            "size": "Grande",
+            "price": 4500
+        },
+        {
+            ":nickname": "Afternoon Delight",
+            "menu": "Caramel Macchiato",
+            "extra": "Cocoa powder, 2shots of espresso",
+            "size": "Venti",
+            "price": 5500
+        },
+        {
+            "nickname":"My Happiness",
+            "menu": "Blueberry Muffin",
+            "extra": "",
+            "size": "",
+            "price": 3000
+        }
+    ],
+    "total_menu": [
+        {
+            "menu": "Caffe Latte",
+            "price": 4500
+        },
+        {
+            "menu": "Caramel Macchiato",
+            "price": 5500
+        },
+        {
+            "menu": "Blueberry Muffin",
+            "price": 3000
+        },
+        {
+            "menu": "Espresso",
+            "price": 4000
+        },
+        {
+            "menu": "Vanilla Latte",
+            "price": 5000
+        },
+        {
+            "menu": "Cold Brew",
+            "price": 4500
+        },
+        {
+            "menu": "Caramel Macchiato",
+            "price": 5500
+        },
+        {
+            "menu": "Blueberry Muffin",
+            "price": 3000
+        }
+    ]
+}

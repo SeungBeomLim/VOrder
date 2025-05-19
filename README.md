@@ -4,9 +4,7 @@
 1) backend 디렉토리에 .env 파일 생성 후 OPENAI_API_KEY = "" 넣기.
 
 2) Backend 서버 실행 (/backend 디렉토리에서)
-   
 source venv/bin/activate -> 가상환경 실행
-
 python manage.py runserver -> 서버 실행
 
 4) Frontend 서버 실행 (/frontend 디렉토리에서)

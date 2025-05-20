@@ -1,6 +1,7 @@
 import os
 import re
 import json
+from dbconnect import process_and_upload_to_mongodb
 from datetime import datetime, timedelta
 from django.conf import settings
 from langchain_openai import ChatOpenAI
@@ -113,6 +114,7 @@ def order_agent(user_input: str) -> tuple:
             "ETA": eta_time
         }
 
+        process_and_upload_to_mongodb(final_order)
         final_order_path = os.path.join(settings.MEDIA_ROOT, "final_order.json")
         with open(final_order_path, "w", encoding="utf-8") as f:
             json.dump(final_order, f, ensure_ascii=False, indent=2)

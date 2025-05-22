@@ -1,5 +1,4 @@
 import os
-import torch
 import re
 import json
 from datetime import datetime, timedelta
@@ -19,6 +18,7 @@ chat_model = ChatOpenAI(model="gpt-4o-mini")
 with open("user_info.json", "r", encoding="utf-8") as f:
     user_info = json.load(f)
 
+user_id = user_info["user_id"]
 customer_name   = user_info["name"]
 customer_number = user_info["phone_number"]
 favorite_drinks = user_info.get("favorite_drinks", [])
@@ -40,8 +40,7 @@ You are a Starbucks voice-ordering agent. Follow this flow and respond only in E
 
 3) If saved nickname:
    • Ask “Please tell me your nickname.”
-   • Match against saved_menu on the “nickname” field:
-     {saved_menu}
+   • Match against saved_menu on the “nickname” field: {saved_menu}
    • Ask “Is this correct?” to confirm menu, size, extra, price.
 
 4) If normal order:
@@ -49,12 +48,12 @@ You are a Starbucks voice-ordering agent. Follow this flow and respond only in E
    • Ask “Any extras?” 
    • Ask “What size?”
    • Ask “Anything else to add?”
-   • If “no,” go to payment.
 
-5) At the end of ordering, always ask: “Would you like to proceed to payment?”
+5) After completing the menu selection, ask: “In how many minutes would you like to pick up your order?”
 
-6) At payment confirmation (“Yes, proceed to payment” etc.),
-   • Ask “How many minutes until your order arrives?”
+6) At the end of ordering, always ask: “Would you like to proceed to payment? If so, please say Proceed to payment.”
+
+7) At payment confirmation (“Yes, proceed to payment” etc.),
    • Then extract final order details (menu, size, extra, price) from our conversation via LLM.
    • Compute ETA = now + minutes.
    • Build a JSON object with:
@@ -92,11 +91,6 @@ def process_and_upload_to_mongodb(document: dict):
     # _id 확인
     if "_id" not in document:
         raise ValueError("문서(document)에는 반드시 '_id' 필드가 포함되어야 합니다.")
-
-    # Tensor → list 변환
-    for k, v in document.items():
-        if isinstance(v, torch.Tensor):
-            document[k] = v.tolist()
 
     client = None
     try:
@@ -137,7 +131,7 @@ def order_agent(user_input: str) -> tuple:
     messages.append(AIMessage(content=reply))
 
     # detect payment confirmation in user_input
-    if re.search(r"\b(proceed|confirm|yes|go ahead|make the order|place the order|pay|okay)\b", user_input, re.IGNORECASE):
+    if re.search(r"\b(proceed to payment|proceed|payment|confirm|go ahead|make the order|place the order|pay)\b", user_input, re.IGNORECASE):
         messages.append(HumanMessage(content="How many minutes until your order arrives?"))
         eta_reply = chat_model.invoke(messages).content.strip()
         messages.append(AIMessage(content=eta_reply))
@@ -173,7 +167,8 @@ def order_agent(user_input: str) -> tuple:
             "ETA": eta_time
         }
 
-        process_and_upload_to_mongodb(final_order)
+        #process_and_upload_to_mongodb(final_order)
+
         final_order_path = os.path.join(settings.MEDIA_ROOT, "final_order.json")
         with open(final_order_path, "w", encoding="utf-8") as f:
             json.dump(final_order, f, ensure_ascii=False, indent=2)

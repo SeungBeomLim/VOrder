@@ -17,7 +17,7 @@ client = OpenAI(api_key=api_key)
 # 1) query_devices() 로 인덱스 확인 (한 번만 하면 됩니다)
 print(sd.query_devices())
 #    ... MacBook Pro Microphone 이 0번이면 ...
-mic_index = 2
+mic_index = 0
 
 # 2) 기본 입력 장치로 설정
 #    (출력은 지정할 필요 없으면 None)

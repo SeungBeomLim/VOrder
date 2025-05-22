@@ -1,7 +1,6 @@
 import os
 import re
 import json
-from dbconnect import process_and_upload_to_mongodb
 from datetime import datetime, timedelta
 from django.conf import settings
 from langchain_openai import ChatOpenAI

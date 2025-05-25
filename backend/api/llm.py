@@ -1,6 +1,7 @@
 import os
 import re
 import json
+import uuid
 from datetime import datetime, timedelta
 from django.conf import settings
 from langchain_openai import ChatOpenAI
@@ -10,7 +11,6 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from urllib.parse import quote_plus
 import certifi
-from bson import ObjectId
 
 
 # 1. ENV & MODEL SETUP
@@ -93,20 +93,21 @@ def process_and_upload_to_mongodb(document: dict):
         "?retryWrites=true&w=majority&appName=llm-project"
     )
 
-    # document에 _id가 없으면 ObjectId 생성
+    # document에 _id가 없으면 uuid4 기반 문자열 생성
     if "_id" not in document:
-        document["_id"] = ObjectId()
+        document["_id"] = uuid.uuid4().hex  # 예: '3fa85f64f5d14f6e9e4adf81c1f1c6b2'
 
-    client = None
+
+    # MongoClient 생성 (SSL 인증서 문제 방지를 위해 certifi 사용)
+    client = MongoClient(
+        uri,
+        tls=True,
+        tlsCAFile=certifi.where(),
+        server_api=ServerApi("1")
+    )
+
     try:
-        # MongoClient 생성 (SSL 인증서 문제 방지를 위해 certifi 사용)
-        client = MongoClient(
-            uri,
-            tls=True,
-            tlsCAFile=certifi.where(),
-            server_api=ServerApi("1")
-        )
-
+        print("Connecting to MongoDB...")
         # 연결 확인
         client.admin.command("ping")
         print("Pinged your deployment. You successfully connected to MongoDB!")
@@ -134,6 +135,7 @@ def process_and_upload_to_mongodb(document: dict):
         if client:
             client.close()
             print("MongoDB connection closed")
+    
 
 
 def order_agent(user_input: str) -> tuple:

@@ -148,7 +148,7 @@ def order_agent(user_input: str) -> tuple:
     messages.append(AIMessage(content=reply))
 
     # detect payment confirmation in user_input
-    if re.search(r"\b(proceed|confirm|yes|go ahead|make the order|place the order|pay|okay)\b", user_input, re.IGNORECASE):
+    if re.search(r"\b(proceed|confirm|go ahead|make the order|place the order|pay)\b", user_input, re.IGNORECASE):
         messages.append(HumanMessage(content="How many minutes until your order arrives?"))
         eta_reply = chat_model.invoke(messages).content.strip()
         messages.append(AIMessage(content=eta_reply))
@@ -184,7 +184,7 @@ def order_agent(user_input: str) -> tuple:
             "ETA": eta_time
         }
 
-        process_and_upload_to_mongodb(final_order)
+        #process_and_upload_to_mongodb(final_order)
         final_order_path = os.path.join(settings.MEDIA_ROOT, "final_order.json")
         with open(final_order_path, "w", encoding="utf-8") as f:
             json.dump(final_order, f, ensure_ascii=False, indent=2)

@@ -91,11 +91,34 @@ if __name__ == "__main__":
 
 def synthesize_and_save(text: str, filename: str) -> Path:
     output_path = Path(settings.MEDIA_ROOT) / f"{filename}.mp3"
+
+    if SPEECH_MODE == "Child":
+        instr = (
+            f"Speak the following text in a very high tone and a bit slowly with easier intonation and extra friendly style, "
+            f"in {LANGUAGE_MODE} language."
+        )
+    elif SPEECH_MODE == "Adult":
+        instr = (
+            f"Speak the following text in a normal and clear voice, "
+            f"in {LANGUAGE_MODE} language."
+        )
+    elif SPEECH_MODE == "Senior":
+        instr = (
+            f"Speak the following text quite a bit slowed down, more loud and clear, "
+            f"with easier intonation—nice, kind, and friendly—"
+            f"in {LANGUAGE_MODE} language."
+        )
+    else:
+        instr = (
+            f"Speak the following text clearly, "
+            f"in {LANGUAGE_MODE} language."
+        )
+    
     with client.audio.speech.with_streaming_response.create(
         model=TTS_MODEL,
         voice=VOICE,
         input=text,
-        instructions="Speak clearly in English.",
+        instructions=instr,
     ) as response:
         response.stream_to_file(str(output_path))
     return output_path

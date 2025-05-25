@@ -28,3 +28,7 @@ dist/
 
 # 기타
 *.swp
+
+final_order.json
+latest_confirm_reply.mp3
+latest_relpy.mp3

@@ -9,6 +9,8 @@ from tqdm import tqdm
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from urllib.parse import quote_plus
+import certifi
+from bson import ObjectId
 
 
 # 1. ENV & MODEL SETUP
@@ -18,7 +20,6 @@ chat_model = ChatOpenAI(model="gpt-4o-mini")
 with open("user_info.json", "r", encoding="utf-8") as f:
     user_info = json.load(f)
 
-user_id = user_info["user_id"]
 customer_name   = user_info["name"]
 customer_number = user_info["phone_number"]
 favorite_drinks = user_info.get("favorite_drinks", [])
@@ -40,7 +41,8 @@ You are a Starbucks voice-ordering agent. Follow this flow and respond only in E
 
 3) If saved nickname:
    • Ask “Please tell me your nickname.”
-   • Match against saved_menu on the “nickname” field: {saved_menu}
+   • Match against saved_menu on the “nickname” field:
+     {saved_menu}
    • Ask “Is this correct?” to confirm menu, size, extra, price.
 
 4) If normal order:
@@ -48,12 +50,12 @@ You are a Starbucks voice-ordering agent. Follow this flow and respond only in E
    • Ask “Any extras?” 
    • Ask “What size?”
    • Ask “Anything else to add?”
+   • If “no,” go to payment.
 
-5) After completing the menu selection, ask: “In how many minutes would you like to pick up your order?”
+5) At the end of ordering, always ask: “Would you like to proceed to payment?”
 
-6) At the end of ordering, always ask: “Would you like to proceed to payment? If so, please say Proceed to payment.”
-
-7) At payment confirmation (“Yes, proceed to payment” etc.),
+6) At payment confirmation (“Yes, proceed to payment” etc.),
+   • Ask “How many minutes until your order arrives?”
    • Then extract final order details (menu, size, extra, price) from our conversation via LLM.
    • Compute ETA = now + minutes.
    • Build a JSON object with:
@@ -74,32 +76,45 @@ messages = [SystemMessage(content=system_prompt)]
 
 
 def process_and_upload_to_mongodb(document: dict):
+    """
+    document에 '_id'가 없으면 ObjectId를 생성해서 추가한 뒤,
+    order.order_list 컬렉션에 upsert합니다.
+    """
+    # MongoDB 접속 정보
     username = quote_plus("justintak0426")
     password = quote_plus("b3fQp24yJubBo9rm")
-    uri = f"mongodb+srv://{username}:{password}@llm-project.5t4zx.mongodb.net/?retryWrites=true&w=majority&appName=llm-project"
-    
-    # Create a new client and connect to the server
-    client = MongoClient(uri, server_api=ServerApi('1'))
+    cluster = "llm-project.5t4zx.mongodb.net"
+    database = "order"
+    collection_name = "order_list"
 
-    # Send a ping to confirm a successful connection
-    try:
-        client.admin.command('ping')
-        print("Pinged your deployment. You successfully connected to MongoDB!")
-    except Exception as e:
-        print(e)
+    uri = (
+        f"mongodb+srv://{username}:{password}"
+        f"@{cluster}/{database}"
+        "?retryWrites=true&w=majority&appName=llm-project"
+    )
 
-    # _id 확인
+    # document에 _id가 없으면 ObjectId 생성
     if "_id" not in document:
-        raise ValueError("문서(document)에는 반드시 '_id' 필드가 포함되어야 합니다.")
+        document["_id"] = ObjectId()
 
     client = None
     try:
-        # MongoDB 연결
-        print("Connecting to MongoDB...")
-        client = MongoClient(uri, server_api=ServerApi('1'))
-        db = client["order"]
-        collection = db["order_list"]
+        # MongoClient 생성 (SSL 인증서 문제 방지를 위해 certifi 사용)
+        client = MongoClient(
+            uri,
+            tls=True,
+            tlsCAFile=certifi.where(),
+            server_api=ServerApi("1")
+        )
 
+        # 연결 확인
+        client.admin.command("ping")
+        print("Pinged your deployment. You successfully connected to MongoDB!")
+
+        db = client[database]
+        collection = db[collection_name]
+
+        # Upsert
         print(f"Upserting document with _id={document['_id']}...")
         result = collection.update_one(
             {"_id": document["_id"]},
@@ -107,10 +122,10 @@ def process_and_upload_to_mongodb(document: dict):
             upsert=True
         )
 
-        if result.upserted_id is not None:
-            print(f"Inserted new document with _id={result.upserted_id}")
+        if result.upserted_id:
+            print(f"Inserted new document, _id={result.upserted_id}")
         else:
-            print(f"Updated existing document with _id={document['_id']}")
+            print(f"Updated existing document, _id={document['_id']}")
 
     except Exception as e:
         print(f"MongoDB 오류 발생: {e}")
@@ -131,7 +146,7 @@ def order_agent(user_input: str) -> tuple:
     messages.append(AIMessage(content=reply))
 
     # detect payment confirmation in user_input
-    if re.search(r"\b(proceed to payment|proceed|payment|confirm|go ahead|make the order|place the order|pay)\b", user_input, re.IGNORECASE):
+    if re.search(r"\b(proceed|confirm|yes|go ahead|make the order|place the order|pay|okay)\b", user_input, re.IGNORECASE):
         messages.append(HumanMessage(content="How many minutes until your order arrives?"))
         eta_reply = chat_model.invoke(messages).content.strip()
         messages.append(AIMessage(content=eta_reply))
@@ -167,8 +182,7 @@ def order_agent(user_input: str) -> tuple:
             "ETA": eta_time
         }
 
-        #process_and_upload_to_mongodb(final_order)
-
+        process_and_upload_to_mongodb(final_order)
         final_order_path = os.path.join(settings.MEDIA_ROOT, "final_order.json")
         with open(final_order_path, "w", encoding="utf-8") as f:
             json.dump(final_order, f, ensure_ascii=False, indent=2)

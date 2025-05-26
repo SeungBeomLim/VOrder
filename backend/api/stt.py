@@ -23,7 +23,7 @@ mic_index = 2
 # (출력은 지정할 필요 없으면 None)
 # sd.default.device = (mic_index, None)
 sd.default.device = (None, None)
-print(sd.device)
+print(sd.query_devices())
 
 audio_queue = queue.Queue()
 samplerate = 16000

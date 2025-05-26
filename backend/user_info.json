@@ -1,6 +1,7 @@
 {
     "user_id": "123456789",
     "name": "Justin Tak",
+    "age":20,
     "email": "justin.tak0426@gmail.com",
     "phone_number": "+82-10-1234-5678",
     "membership_tier": "Gold",

@@ -21,6 +21,7 @@ with open("user_info.json", "r", encoding="utf-8") as f:
     user_info = json.load(f)
 
 customer_name   = user_info["name"]
+customer_age    = user_info["age"]
 customer_number = user_info["phone_number"]
 favorite_drinks = user_info.get("favorite_drinks", [])
 saved_menu      = user_info.get("saved_menu", [])

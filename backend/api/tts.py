@@ -8,7 +8,7 @@ from django.conf import settings
 
 # --- Configuration ---
 LANGUAGE_MODE = "English"   # Language Mode 
-SPEECH_MODE = "Senior"       # Speech Mode : Child, Adult, Senior
+SPEECH_MODE = "Senior"      # Speech Mode : Child, Adult, Senior
 VOICE = "ballad"            # Voice Setting (can change later )
 ## available options 
 # Voice Profiles (TTS OpenAI & RelyWP)

@@ -6,6 +6,7 @@
     "phone_number": "+82-10-1234-5678",
     "membership_tier": "Gold",
     "reward_points": 1250,
+
     "favorite_drinks": [
         "Caffe Latte",
         "Caramel Macchiato",
@@ -13,6 +14,7 @@
         "Vanilla Latte",
         "Espresso"
     ],
+
     "saved_menu": [
         {
             "nickname": "Morning Boost",
@@ -36,6 +38,7 @@
             "price": 3000
         }
     ],
+
     "total_menu": [
         {
             "menu": "Caffe Latte",
@@ -70,4 +73,5 @@
             "price": 3000
         }
     ]
+    
 }

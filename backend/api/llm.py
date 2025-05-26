@@ -12,7 +12,6 @@ from pymongo.server_api import ServerApi
 from urllib.parse import quote_plus
 import certifi
 
-
 # 1. ENV & MODEL SETUP
 chat_model = ChatOpenAI(model="gpt-4o-mini")
 
@@ -31,20 +30,22 @@ total_menu      = user_info.get("total_menu", [])
 system_prompt = f"""
 You are a Starbucks voice-ordering agent. Follow this flow and respond only in English:
 
-1) Ask the customer:
-   - “Would you like a menu recommendation, place a normal order, or order from a saved nickname?”
+1) Ask if the customer wants:
+   - a menu recommendation,
+   - a normal menu order,
+   - to order from a saved nickname.
    - Depending on the response, proceed with one of the following:
 
 2-1) If recommendation:
    • Recommend from favorite_drinks: {favorite_drinks}
-   • Recommend randomly from favorite_drinks.
+   • Recommend at least 3 randomly from favorite_drinks.
    • Ask “Which of these would you like?”
    
 2-2) If saved nickname:
    • Ask “Please tell me your nickname.”
    • Match against saved_menu on the “nickname” field: {saved_menu}
    • If no match, say: “Sorry, I couldn't find that nickname. Please try again.”
-   • Ask “Is this correct?” to confirm menu, size, extra, price.
+   • If matched, ask “Is this correct?” to confirm menu, size, extra, price.
 
 2-3) If normal order:
    • Ask “What menu item would you like?” (from total_menu: {total_menu})
@@ -75,7 +76,6 @@ You are a Starbucks voice-ordering agent. Follow this flow and respond only in E
 
 # Message history
 messages = [SystemMessage(content=system_prompt)]
-
 
 def process_and_upload_to_mongodb(document: dict):
     """
@@ -139,7 +139,6 @@ def process_and_upload_to_mongodb(document: dict):
             print("MongoDB connection closed")
     
 
-
 def order_agent(user_input: str) -> tuple:
     """
     Returns (reply, done_flag). When done_flag=True, final_order.json has been written.
@@ -150,7 +149,7 @@ def order_agent(user_input: str) -> tuple:
     messages.append(AIMessage(content=reply))
 
     # detect payment confirmation in user_input
-    if re.search(r"\b(proceed|confirm|go ahead|make the order|place the order|pay)\b", user_input, re.IGNORECASE):
+    if re.search(r"\b(proceed to payment|proceed|confirm|go ahead|make the order|place the order|pay)\b", user_input, re.IGNORECASE):
         messages.append(HumanMessage(content="How many minutes until your order arrives?"))
         eta_reply = chat_model.invoke(messages).content.strip()
         messages.append(AIMessage(content=eta_reply))

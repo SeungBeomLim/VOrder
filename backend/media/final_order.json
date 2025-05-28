@@ -1,10 +1,10 @@
 {
   "customer": "Justin Tak",
   "number": "+82-10-1234-5678",
-  "menu": "Cold Brew",
-  "size": "Venti",
-  "extra": "",
+  "menu": "Caffe Latte",
+  "size": "Grande",
+  "extra": "Two shots of espresso",
   "price": 4500,
-  "ETA": "19:50",
-  "_id": "fd029167cd344178b29d84fafa9da81e"
+  "ETA": "20:04",
+  "_id": "477d249f84c4419b81f527b0d195d669"
 }

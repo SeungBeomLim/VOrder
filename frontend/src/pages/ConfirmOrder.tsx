@@ -82,7 +82,7 @@ export default function ConfirmOrder() {
       <div className="absolute bottom-0 left-0 w-full bg-[#F6F6F6] px-6 py-4 border-t shadow-lg">
         <div className="border rounded-lg p-4 mb-4 bg-white">
           <p className="text-sm text-black">Subtotal: {subtotal.toFixed(2)}won</p>
-          <p className="text-sm text-black">Tax: {tax.toFixed(2)}$</p>
+          <p className="text-sm text-black">Tax: {tax.toFixed(2)}won</p>
           <p className="text-sm text-black">Discount: -{discount.toFixed(2)}won</p>
           <hr className="my-2" />
           <p className="text-base font-semibold text-black">Total: {total}won</p>

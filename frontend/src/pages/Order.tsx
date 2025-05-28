@@ -11,9 +11,30 @@ export default function Order() {
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<BlobPart[]>([]);
 
+  const playDing = (frequency = 800, duration = 0.2) => {
+  const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+
+  oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+  oscillator.type = 'sine';
+
+  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+
+  oscillator.start(audioContext.currentTime);
+  oscillator.stop(audioContext.currentTime + duration);
+  };
+
   const startRecording = () => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'recording') {
       audioChunksRef.current = [];
+
+      playDing();
+
       mediaRecorderRef.current.start();
       setRecording(true);
 
@@ -33,6 +54,8 @@ export default function Order() {
       recorder.ondataavailable = (e) => audioChunksRef.current.push(e.data);
 
       recorder.onstop = async () => {
+        playDing();
+
         const blob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
         const formData = new FormData();
         formData.append('audio', blob, 'input.wav');

@@ -7,39 +7,46 @@ export default function ConfirmOrder() {
   const ttsPlayedRef = useRef(false);
 
   useEffect(() => {
-    const loadDataAndPlayTTS = async () => {
-      try {
-        const res = await fetch('http://localhost:8000/media/final_order.json');
-        const data = await res.json();
+  const loadDataAndPlayTTS = async () => {
+    try {
+      const res = await fetch('http://localhost:8000/media/final_order.json');
+      const data = await res.json();
 
-        const orderItem = {
-          customer: data.customer,
-          number: data.number,
-          temp: data.temp,
-          menu: data.menu,
-          size: data.size,
-          extra: data.extra,
-          price: data.price,
-          ETA: data.ETA,
+      const orderItem = {
+        customer: data.customer,
+        number: data.number,
+        temp: data.temp,
+        menu: data.menu,
+        size: data.size,
+        extra: data.extra,
+        price: data.price,
+        ETA: data.ETA,
+      };
+
+      setOrderData([orderItem]);
+
+      if (!ttsPlayedRef.current) {
+        const ttsText = `You ordered a ${data.size} ${data.menu} ${data.extra ? 'with ' + data.extra : ''}. The total is ${data.price}₩.`;
+        const ttsAudio = new Audio(`http://localhost:8000/api/confirm-tts?text=${encodeURIComponent(ttsText)}`);
+
+        console.log('📢 TTS audio.play() triggered');
+        ttsAudio.play().catch((err) => console.warn('TTS autoplay failed:', err));
+        ttsPlayedRef.current = true;
+
+        // 🎵 TTS 끝난 뒤 finish_order.mp3 재생
+        ttsAudio.onended = () => {
+          const finishAudio = new Audio('http://localhost:8000/media/finish_order.mp3');
+          finishAudio.play().catch((err) => console.warn('Finish audio autoplay failed:', err));
         };
-
-        setOrderData([orderItem]);
-
-        // ✅ TTS는 단 한 번만 실행되도록 보장
-        if (!ttsPlayedRef.current) {
-          const ttsText = `You ordered a ${data.size} ${data.menu} ${data.extra ? 'with ' + data.extra : ''}. The total is ${data.price}₩.`;
-          const audio = new Audio(`http://localhost:8000/api/confirm-tts?text=${encodeURIComponent(ttsText)}`);
-          console.log('📢 TTS audio.play() triggered');
-          audio.play();
-          ttsPlayedRef.current = true;
-        }
-      } catch (err) {
-        console.error('❌ Failed to load order summary or play TTS:', err);
       }
-    };
+    } catch (err) {
+      console.error('❌ Failed to load order summary or play TTS:', err);
+    }
+  };
 
-    loadDataAndPlayTTS();
-  }, []);
+  loadDataAndPlayTTS();
+}, []);
+
 
   const handleCancel = () => {
     navigate('/');

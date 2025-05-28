@@ -10,15 +10,14 @@
     "favorite_drinks": [
         "Caffe Latte",
         "Caramel Macchiato",
-        "Cold Brew",
-        "Vanilla Latte",
-        "Espresso"
+        "Cold Brew"
     ],
 
     "saved_menu": [
         {
             "nickname": "Morning Boost",
             "menu": "Caffe Latte",
+            "temp": "Iced",
             "extra": "Vanilla Syrup",
             "size": "Grande",
             "price": 4500
@@ -26,16 +25,18 @@
         {
             ":nickname": "Afternoon Delight",
             "menu": "Caramel Macchiato",
+            "temp": "Hot",
             "extra": "Cocoa powder, 2shots of espresso",
             "size": "Venti",
             "price": 5500
         },
         {
             "nickname":"My Happiness",
-            "menu": "Blueberry Muffin",
-            "extra": "",
-            "size": "",
-            "price": 3000
+            "menu": "Cold Brew",
+            "temp": "Iced",
+            "extra": "Almond Milk",
+            "size": "Tall",
+            "price": 5000
         }
     ],
 
@@ -49,8 +50,20 @@
             "price": 5500
         },
         {
-            "menu": "Blueberry Muffin",
-            "price": 3000
+            "menu": "Cappuccino",
+            "price": 5000
+        },
+        {
+            "menu": "Mocha",
+            "price": 6000
+        },
+        {
+            "menu": "Americano",
+            "price": 4000
+        },
+        {
+            "menu": "Flat White",
+            "price": 5500
         },
         {
             "menu": "Espresso",

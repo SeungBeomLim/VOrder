@@ -11,6 +11,7 @@ from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 from urllib.parse import quote_plus
 import certifi
+from zoneinfo import ZoneInfo
 
 # 1. ENV & MODEL SETUP
 chat_model = ChatOpenAI(model="gpt-4o-mini")
@@ -87,6 +88,7 @@ You are a Starbucks voice-ordering agent. Follow this flow and respond only in E
 # Message history
 messages = [SystemMessage(content=system_prompt)]
 
+
 def process_and_upload_to_mongodb(document: dict):
     """
     document에 '_id'가 없으면 ObjectId를 생성해서 추가한 뒤,
@@ -147,12 +149,14 @@ def process_and_upload_to_mongodb(document: dict):
         if client:
             client.close()
             print("MongoDB connection closed")
-    
+
 
 def order_agent(user_input: str) -> tuple:
     """
     Returns (reply, done_flag). When done_flag=True, final_order.json has been written.
     """
+    global eta_minutes
+
     messages.append(HumanMessage(content=user_input))
     ai_resp = chat_model.invoke(messages)
     reply = ai_resp.content.strip()
@@ -183,7 +187,11 @@ def order_agent(user_input: str) -> tuple:
             print("❌ Failed to extract JSON:", e)
             return reply, False
 
-        eta_time = (datetime.now() + timedelta(minutes=minutes)).strftime("%H:%M")
+        print("Current Time: ", datetime.now(ZoneInfo("Asia/Seoul")))
+        print("ETA Minutes: ", minutes)
+        eta_time = (datetime.now(ZoneInfo("Asia/Seoul")) + timedelta(minutes=minutes)).strftime("%H:%M")
+        print("ETA Time: ", eta_time)
+
 
         final_order = {
             "customer": customer_name,

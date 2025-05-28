@@ -15,6 +15,7 @@ export default function ConfirmOrder() {
         const orderItem = {
           customer: data.customer,
           number: data.number,
+          temp: data.temp,
           menu: data.menu,
           size: data.size,
           extra: data.extra,
@@ -72,8 +73,8 @@ export default function ConfirmOrder() {
           <div key={idx} className="mb-4 border rounded-lg p-4 bg-white shadow-sm">
             <p className="font-semibold text-black">{item.menu}</p>
             <div className="flex justify-between mt-1 text-sm text-[#5F5F5F]">
-              <p>Size: {item.size}\n {item.extra ? `Extra: ${item.extra}` : '\n'}</p>
-              <p>\n{item.price.toFixed(2)}₩</p>
+              <p>Temperature: {item.temp} / Size: {item.size} / {item.extra ? `Extra: ${item.extra}` : '/'}</p>
+              <p>{item.price.toFixed(2)}₩</p>
             </div>
           </div>
         ))}

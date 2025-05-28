@@ -3,8 +3,9 @@
   "number": "+82-10-1234-5678",
   "menu": "Caffe Latte",
   "size": "Grande",
-  "extra": "Vanilla Syrup, 2 shots of Espresso",
+  "temp": "Iced",
+  "extra": "Vanilla Syrup",
   "price": 4500,
-  "ETA": "20:26",
-  "_id": "33a6ccf97c4844fca39f7c02b10bc2a4"
+  "ETA": "20:37",
+  "_id": "e57d589c915a455e8360a68fe63d8c0f"
 }

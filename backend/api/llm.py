@@ -176,7 +176,7 @@ def order_agent(user_input: str) -> tuple:
 
         extract_prompt = (
             "From our conversation, extract only the final order details "
-            "and return a raw JSON object with keys: menu, size, extra, price. No explanation."
+            "and return a raw JSON object with keys: menu, size, temp, extra, price. No explanation."
         )
         messages.append(SystemMessage(content=extract_prompt))
         extract_resp = chat_model.invoke(messages).content.strip()
@@ -201,6 +201,7 @@ def order_agent(user_input: str) -> tuple:
             "number": customer_number,
             "menu": details.get("menu", ""),
             "size": details.get("size", ""),
+            "temp": details.get("temp", ""),
             "extra": details.get("extra", ""),
             "price": details.get("price", 0),
             "ETA": eta_time
